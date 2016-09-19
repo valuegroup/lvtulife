@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.lvtulife.base.mapper.impl.BaseMapperImpl">
+    <!-- 新增 -->
+    <insert id="create" useGeneratedKeys="true" keyProperty="id">
+        <!--<selectKey keyColumn="id" resultType="java.lang.Integer">
+            select LAST_INSERT_ID()
+        </selectKey>-->
+        ${value}
+    </insert>
+
+    <!-- 批量新增 -->
+    <insert id="createOfBatch" useGeneratedKeys="true" keyProperty="id">
+        ${value}
+    </insert>
+
+    <!-- 根据ID删除 -->
+    <delete id="removeById">
+        ${value}
+    </delete>
+
+    <!-- 批量删除 -->
+    <delete id="removeOfBatch">
+        ${value}
+    </delete>
+
+    <!-- 批量删除 -->
+    <delete id="removeAll">
+        ${value}
+    </delete>
+
+    <!-- 更新 -->
+    <update id="modify">${value}</update>
+
+    <!-- 根据ID查询单个 -->
+    <select id="findOneById" resultType="hashmap">
+        ${value}
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="findAll" resultType="hashmap">
+        ${value}
+    </select>
+
+    <!-- 查询总数量 -->
+    <select id="findAllCount" resultType="Long">
+        ${value}
+    </select>
+
+    <!-- 获取下一个序列的值 -->
+    <select id="fetchSeqNextval" resultType="Long" flushCache="true">
+        ${value}
+    </select>
+</mapper>

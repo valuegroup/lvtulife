@@ -1,0 +1,264 @@
+<li>
+    <div class="time">20160326</div>
+    <div class="version">v1.2</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+v1.2 版本开始↑
+版本说明：
+考虑到前个版本搁置的太久了没法继续的进行开发，同时在工作和学习过程中还发现在此框架中还有很多的东西不够完善，进而终止前版本的开发
+新版本使用新的开发工具IntelliJ IDEA,数据库中所有的表按照规范重新的设计和生成
+上个版本中规划了很多的东西，由于时间的关系都没有完成，因此在此版本和随后的版本中依据实际的情况进行功能的开发
+当前版本主要会完善系统的底层架构、基础的功能模块和通用的功能模块
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20150928</div>
+    <div class="version">v1.1.4</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+v1.1 版本结束↓
+
+资源管理>优化资源管理功能
+<br>1.双击某行可以进入查看页面
+<br>2.新增批量新增功能[待完成]
+<br>3.涉及数据库操作时需对按钮进行保护[待完成]
+<br>4.各种操作提示
+
+系统全局>提取列表页面和表单页面公有js方法,modalDialog版
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20150903</div>
+    <div class="version">v1.1.3</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统全局>优化页面中下拉选值取值方式,并将js方法公有话.现在提供从系统常量类,字典表,指定表和表字段三种方式
+系统全局>优化单个页面加载速度,模块化加载js等插件
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20150824</div>
+    <div class="version">v1.1.2</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+底层代码>优化页面跳转公有方法,因变量中添加了static关键字导致页面跳转异常
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20150717</div>
+    <div class="version">v1.1.1</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统全局>数据结构>优化所有表数据结构
+系统全局>增加系统常量类和处理类
+系统框架>新的权限控制,基础结构调整
+系统全局>日志功能优化
+系统全局>400~500异常提醒机制优化
+系统全局>框架升级,将struts2替换为spring mcv,并将spring3升级至spring4
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20150716</div>
+    <div class="version">v1.1.0</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+v1.1 版本开始↑
+版本说明：
+第一版本由于前期设计经验不足,造成后续开发中局限性太大,而且连续开发时间过短因此终止第一版本开发
+新版本将逐步的完善第一版本中存在的设计缺陷,同时会把新掌握的内容引入到项目中,并不断的优化项目
+新版本中将重构基础功能并着重开发easywms和一版本中遗留功能
+新版本将会开放重要功能模块的接口,以便后续其它终端开发使用
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140930</div>
+    <div class="version">v1.0.34</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+v1.0 版本结束↓
+系统全局>全局选项卡中添加关闭所有选项卡功能
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140929</div>
+    <div class="version">v1.0.33</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+自动生成>优化时间控件,加入区间值限制 http://www.cnblogs.com/yuhanzhong/archive/2011/08/10/2133276.html
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140929</div>
+    <div class="version">v1.0.32</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+仓储实体>加入虚拟ID字段,便于通用JS方法的实现
+自动生成>加入下拉框选值的逻辑处理
+系统全局>提取列表页面和表单页面公有JS方法,并在自动生成功能中实现
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140927</div>
+    <div class="version">v1.0.31</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+自动生成>Integer类型字段在列表页面设置居中
+系统全局>规范系统逻辑判断常量工具类
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140920</div>
+    <div class="version">v1.0.30</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+仓储系统>基础资料>添加包装单位\货物品牌\仓库信息的基础数据
+自动生成>优化'Action中修改时校验该记录是否存在'功能的生成规则
+自动生成>优化'列表页面各列长度定义'的生成规则
+数据库表>修改部分表字段命名,首字母必须2个以上,如B_ACTIVE这种方式不行
+货物信息>添加品牌logo,手机logo等字段
+系统全局>所选内容在选项卡中已打开,若再触发打开事件时重新加载页面
+组件扩展>修复textbox在使用validatebox的验证方法时所出现的问题
+编译部署>修复'BASE64Decoder是内部专用 API, 可能会在未来发行版中删除'的问题
+系统框架>窗口缩小时,列表页面横向滚动条丢失
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140917</div>
+    <div class="version">v1.0.29</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+自动生成>增加批量添加功能
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140916</div>
+    <div class="version">v1.0.28</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+自动生成>优化生成策略,完善表单中各控件的数据验证
+组件扩展>在textbox中继承validatebox的验证方法,使其能够在文本域的情况下支持长度验证[调整,该控件默认已继承无需再继承,只需在lang-zh_CN中添加中文译文就行]
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140913</div>
+    <div class="version">v1.0.27</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+数据删除>修复数据删除后点编辑按钮数据重现问题
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140912</div>
+    <div class="version">v1.0.26</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+仓储系统>增加系统参数表
+仓储系统>调整菜单功能
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140911</div>
+    <div class="version">v1.0.25</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+自动生成>优化列表界面中长列名的宽度
+自动生成>生成仓储管理模块中的MVC数据
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140910</div>
+    <div class="version">v1.0.24</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统功能>代码自动生成
+自动生成>优化控制层结构并精简代码
+系统异常>时间类型无法自动转换以至于存储失效,xwork-conversion.properties
+统一样式>优化列表界面中搜索框和按钮样式统一,能自适应窗口
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140902</div>
+    <div class="version">v1.0.23</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+字典管理>优化展现层结构并精简代码
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140901</div>
+    <div class="version">v1.0.22</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+main.jsp>增加通用友好提示 mainShowSlide(info)
+字典管理>将多页面(list\add\detail\edit)展现方式修改为(xx\form)
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140824</div>
+    <div class="version">v1.0.21</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+将["jsp:include page='../../include/inc.jsp"]修改为绝对路径
+系统框架>增加代码自动生成功能,能够生成dao\service\action\jsp的开发模型
+系统全局>增加新的界面展现方式(tab 选项卡方式,多页面)
+</pre>
+    </div>
+</li>

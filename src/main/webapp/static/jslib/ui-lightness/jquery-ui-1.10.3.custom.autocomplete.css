@@ -1,0 +1,32 @@
+ .ui-autocomplete {
+    max-height: 220px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 220px;
+  }
+.ui-autocomplete-loading {
+   background: white url('images/animated-overlay.gif') right center no-repeat;
+}  
+.ui-autocomplete-input{
+	width:138px;
+	font-size: 10pt;
+	padding: 1px 5px;
+	border: 1px solid #C0BBB4;
+	background: #fff url(images/shark.gif) no-repeat right;
+	repeat-x;
+}
+
+.ui-autocomplete-input:hover {
+	width:138px;
+	font-size: 10pt;
+	border: 1px solid #99CC00;
+	background: #fff url(images/shark.gif) no-repeat right;
+	repeat-x;
+}
+.ui-autocomplete-loading {background: white url('/website/images/loading_16.gif') right center no-repeat;}

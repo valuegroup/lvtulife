@@ -1,0 +1,21 @@
+[{
+	"id":"_blank",
+	"text":"_blank",
+	"desc":"在新窗口中打开被链接文档。"
+},{
+	"id":"_self",
+	"text":"_self",
+	"desc":"默认。在相同的框架中打开被链接文档。"
+},{
+	"id":"_parent",
+	"text":"_parent",
+	"desc":"在父框架集中打开被链接文档。"
+},{
+	"id":"_top",
+	"text":"_top",
+	"desc":"在整个窗口中打开被链接文档。"
+},{
+	"id":"framename",
+	"text":"framename",
+	"desc":"在指定的框架中打开被链接文档。"
+}]

@@ -1,0 +1,277 @@
+<li>
+    <div class="time">20160414</div>
+    <div class="version">v1.2.20</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+基础数据>新增RequestUrlBean单例类，用户获取Controller中所有的RequestMapping请求链接，可用于SpringSecurity
+系统框架>集成spring security；在SecurityMetadataSourceManagerImpl类中新增reloadResource()方法,用于重新加载SpringSecurity资源权限
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160413</div>
+    <div class="version">v1.2.19</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+用户管理>增加【是否为超级管理员is_spuer】字段，用于标识系统管理员
+角色管理>增加【数据来源source】字段，用于区分内置数据还是用户自定义的数据
+用户管理>增加设置超级管理员的功能
+用户管理>增加设置用户状态的功能
+系统框架>集成spring security；优化SecurityMetadataSourceManagerImpl数据加载方式
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160412</div>
+    <div class="version">v1.2.18</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+自动生成>修复页面打开为404的问题，解决方案：错将@RequestMapping的value写成name
+控制层>增加最底层的控制层StandardController，BaseController继承该类，若其他Controller中不含单表操作可以继承该类
+主页功能>优化后台主页菜单加载方法
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160411</div>
+    <div class="version">v1.2.17</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>更改数据库连接池，将原开源的c3p0改为阿里开源的Druid
+统计报表>修复注册时间分布功能失效的问题
+统计报表>修复用户角色分布功能失效的问题
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">201604010</div>
+    <div class="version">v1.2.16</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+资源数据>检查所有的资源数据，并清除无效的资源数据
+数据监控>数据源监控功能异常【/druid/index.html】，配置权限后打开显示的是/druid/index.html源码；临时解决方案：在security.xml配置文件中对druid的静态资源的权限放开
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160409</div>
+    <div class="version">v1.2.15</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>开启国际化消息
+资源管理>增加【资源路径path】字段
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160408</div>
+    <div class="version">v1.2.14</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>优化各层的访问顺序，开发以此访问顺序为标准【controller>manager>service>dao】,controller.api只能调用manager的方法，不可以直接访问service
+系统框架>其中修改SysUserGroupManager，移除service的get()方法，将service的部分方法提供给manager
+资源管理>增加【资源属性resAttr：（菜单，功能）】字段
+系统框架>优化Ehcache配置
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160407</div>
+    <div class="version">v1.2.13</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统优化>优化DictionaryBean单例类
+系统优化>优化BaseMessage单例类
+系统框架>集成spring security；生成验证码的服务对象和获取验证码验证时获取的服务对象不一致，导致验证码验证不通过,原因是spring初始化了多次，现在重新修改为【@Resource(name = "imageCaptchaService")】
+系统框架>集成spring security；加入【security:custom-filter ref="customSecurityFilter"
+before="FILTER_SECURITY_INTERCEPTOR"】
+
+系统架构>集成spring security；完成整套用户角色权限验证
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160406</div>
+    <div class="version">v1.2.12</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统优化>将entity包更名为component(组件包)
+系统优化>优化Controller中RequestMapping的value值，使用静态常量的方式组成 【@RequestMapping(value = SysConstants.API_HEAD_BASE + "/demo")】
+系统优化>优化JSP路径的配置方式，使用静态常量的方式组成 【LIST_PAGE_URL = "forward:" + SysConstants.PATH_BASE + "/baseDemo.jsp";】
+系统优化>优化spring注解自动扫描的方式，context:component-scan:@Controller (servlet.xml);@Service,@Repository,@Component (spring.xml)
+系统优化>优化spring加载初始化多次的问题，解决方南将 spring.xml 文件拆分成 spring.xml 和 servlet.xml，spring.xml 负责加载spring 框架的内容，servlet.xml 加载spring mcv 框架的内容
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160405</div>
+    <div class="version">v1.2.11</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+登录监控>将原 base 模块下的 OnlineListener 类移动到 system 模块下，online 操作的时候会往 system 模块下的表中写记录
+登录优化>集成spring security；在 CustomSavedRequestAwareAuthenticationSuccessHandler 类中的 onAuthenticationSuccess 方法中，对用户状态等信息进行校验
+系统框架>集成spring security；登录异常的问题，原因是【DaoAuthenticationProvider中添加了ReflectionSaltSource】
+系统框架>集成spring security；在登录页面中添加【/$/{SPRING_SECURITY_LAST_EXCEPTION.message}】用于展现错误信息
+系统框架>继承spring security；解决页面中无法使用frame框架加载页面的问题【in a frame because it set 'X-Frame-Options' to 'DENY'.】；解决方案 security.xml 中 http>headers>frame-options policy="SAMEORIGIN"
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160404</div>
+    <div class="version">v1.2.10</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>集成spring security；生成验证码的服务对象和获取验证码验证时获取的服务对象不一致，导致验证码验证不通过,临时解决方案【改@Resource(name = "imageCaptchaService")为SpringContextUtil.getBean("imageCaptchaService");】)
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160403</div>
+    <div class="version">v1.2.9</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>集成spring security；登录时无法识别post请求，原因是开启了csrf【security:csrf token-repository-ref="csrfTokenRepository" disabled="true"】
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160402</div>
+    <div class="version">v1.2.8</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>集成spring security；启动报错【Configuration problem: Filter beans 'customUsernamePasswordFilter' and 'org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter#0' have the same 'order' value.】，原因是同时定义了【security:form-login】和【UsernamePasswordAuthenticationFilter】
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160401</div>
+    <div class="version">v1.2.7</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>集成spring security；简单配置security【security.xml】
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160331</div>
+    <div class="version">v1.2.6</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>集成spring security；版本选择，比较3.x和4.x,的区别
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160330</div>
+    <div class="version">v1.2.5</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+角色管理>角色授权调试通过
+前端通用>提取extPageCustomD.js，可用于简单的功能页面
+前端按钮>通用按钮刷新，调用disableToolbarButton(true/false)即可
+用户管理>用户导入功能调试通过
+用户管理>用户导出功能调试通过
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160329</div>
+    <div class="version">v1.2.4</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+用户管理>业务流程调试通过
+icons.jsp>图标从上往下延迟加载
+延迟加载>加入jquery.lazyload.min.js,控制图片延迟加载
+版本升级>服务器上升级至1.2版本
+系统底层>在BaseDaoImpl中新增了四个方法，能够通过SQL查询指定类型的数据
+用户管理>角色授予调试通过
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160328</div>
+    <div class="version">v1.2.3</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+资源管理>解决编辑和查看时不能加载表单的问题
+资源管理>编辑时，资源图标居中的问题extIcon.css(center center)
+表单页面>所有的表单添加页面，将主键行隐藏，需要再id所在tr加上id="primaryKeyTr"
+资源管理>业务流程调试通过
+资源类型>业务流程调试通过
+角色管理>业务流程调试通过
+用户监控>业务流程调试通过
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160327</div>
+    <div class="version">v1.2.2</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+基础数据>初始化system模块下各表基础数据
+Ehcache>缓存的对象需要实现序列号接口 implements Serializable
+登录监控>修复SysOnline上下线保存数据失败的问题，并优化其方法
+登录功能>修复无法登录的问题
+Session>修复在request.getSession()中存在用户对象的问题，去除SysUserController类上@SessionAttributes(types = SysUser.class)
+
+退出系统>修复退出系统时出现java.lang.IllegalStateException: Cannot create a session after the response has been
+committed的问题，不可使用@SessionAttributes
+
+系统全局>去除敏感字段 Cookie cookie_sys_user_name=superadmin; cookie_sys_user_passwd=123456;
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20160326</div>
+    <div class="version">v1.2.1</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+开发工具>熟悉并使用新的开发工具
+版本控制>在服务器上搭建SVN,并将代码同步至SVN，方便开发
+框架搭建>基于1.1和公司的系统，搭建新的框架
+框架搭建>将1.1版本中的所有功能移植到新版本中
+异常处理>设置统一的异常处理机制，在BaseController中使用@ExceptionHandler
+事务处理>在BaseServiceImpl中使用@Transactional管理事务
+系统全局>优化表单提交,提交按钮增加不可用控制,防止重复提交
+</pre>
+    </div>
+</li>

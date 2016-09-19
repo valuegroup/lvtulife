@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务初始参数表 Mybatis Dao实现 -->
+<mapper namespace="com.lvtulife.gtd.mapper.GtdInitParamsMapper">
+
+    <select id="findGtdInitParams" parameterType="int" resultType="com.lvtulife.gtd.model.GtdInitParams">
+        select * from gtd_init_params where id=#{id}
+    </select>
+
+
+</mapper>

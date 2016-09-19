@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security" xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+					http://www.springframework.org/schema/beans/spring-beans.xsd
+					http://www.springframework.org/schema/security
+					http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+    <!-- 开发环境可以放置 <debug /> 配置，会输出详细Security处理日志，正式环境建议屏蔽 <debug /> 配置 -->
+    <!--<security:debug/>-->
+
+    <!-- 开启支持方法注解的权限控制-->
+    <security:global-method-security pre-post-annotations="enabled"/>
+
+    <!-- 不用权限管理的资源路径 不要过滤图片等静态资源，其中**代表可以跨越目录，*不可以跨越目录-->
+
+    <security:http pattern="/static/**" security="none"/>
+    <security:http pattern="/views/include/**" security="none"/>
+    <security:http pattern="/views/error/**" security="none"/>
+    <security:http pattern="/views/common/**" security="none"/>
+
+    <security:http pattern="/*.*" security="none"/>
+    <!--<security:http pattern="/login.jsp" security="none"/>
+    <security:http pattern="/index.jsp" security="none"/>
+    <security:http pattern="/reg.jsp" security="none"/>-->
+
+    <security:http pattern="/system/page/captcha" security="none"/><!--验证码-->
+
+    <!--特殊情况，若开启对druid模块下html的权限控制，会导致druid无法正常使用-->
+    <!--<security:http pattern="/druid/js/**" security="none"/>
+    <security:http pattern="/druid/css/**" security="none"/>
+    <security:http pattern="/druid/*.html" security="none"/>-->
+
+
+    <!--/oauth/token 的http 配置, 用于监听该URL的请求, 核心-->
+    <security:http pattern="/oauth/token" use-expressions="false" create-session="stateless" authentication-manager-ref="oauth2AuthenticationManager"
+                   entry-point-ref="oauth2AuthenticationEntryPoint">
+        <security:intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
+        <security:anonymous enabled="false"/>
+        <security:http-basic entry-point-ref="oauth2AuthenticationEntryPoint"/>
+        <security:custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER"/>
+        <security:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <security:csrf disabled="true"/>
+    </security:http>
+
+    <!--针对不同resource的http配置, 由于上面配置了两个resource, 这儿也配置两个  注意每一个http对应不同的resourceServer. access-decison-manager-ref对应Oauth的AccessDecisionManager-->
+    <!--unity http configuration-->
+    <security:http pattern="/unity/**" create-session="never" entry-point-ref="oauth2AuthenticationEntryPoint"
+                   access-decision-manager-ref="oauth2AccessDecisionManager" use-expressions="false">
+        <security:anonymous enabled="false"/>
+        <security:intercept-url pattern="/unity/**" access="ROLE_UNITY,SCOPE_READ"/>
+        <security:custom-filter ref="unityResourceServer" before="PRE_AUTH_FILTER"/>
+        <security:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <security:csrf disabled="true"/>
+    </security:http>
+
+    <!--resource-server配置, 这儿定义两咱不同的resource 注意: 每个resource-id的值必须在对应的ClientDetails中resourceIds值中存在-->
+    <!--unity resource server filter-->
+    <oauth2:resource-server id="unityResourceServer" resource-id="unity-resource" token-services-ref="tokenServices"/>
+
+    <!--mobile http configuration-->
+    <security:http pattern="/api/**" create-session="never" entry-point-ref="oauth2AuthenticationEntryPoint"
+                   access-decision-manager-ref="oauth2AccessDecisionManager" use-expressions="false">
+        <security:anonymous enabled="false"/>
+        <security:intercept-url pattern="/api/**" access="ROLE_API,SCOPE_READ"/>
+        <security:custom-filter ref="apiResourceServer" before="PRE_AUTH_FILTER"/>
+        <security:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <security:csrf disabled="true"/>
+    </security:http>
+
+    <!--mobile resource server filter-->
+    <oauth2:resource-server id="apiResourceServer" resource-id="api-resource" token-services-ref="tokenServices" entry-point-ref="oauth2AuthenticationEntryPoint"/>
+
+    <!--oauth2 AuthenticationManager配置; 在整个配置中,有两个AuthenticationManager需要配置-->
+    <security:authentication-manager id="oauth2AuthenticationManager">
+        <security:authentication-provider user-service-ref="oauth2ClientDetailsUserService"/>
+    </security:authentication-manager>
+
+
+    <!--authorization-server配置, OAUTH2核心-->
+    <oauth2:authorization-server client-details-service-ref="clientDetailsService" token-services-ref="tokenServices"
+                                 user-approval-handler-ref="oauthUserApprovalHandler"
+                                 user-approval-page="common/oauth_approval"
+                                 error-page="common/oauth_error">
+        <!--在servlet.xml中开启了对模型视图名称的解析，上面写jsp名称就行，oauth_approval.jsp/oauth_error.jsp-->
+
+        <!--指定Oauth支持的grant_type(授权方式)与功能，该元素里面的每个标签可设置每一种authorized-grant-type的行为. 如disable refresh-token的配置为 oauth2:refresh-token disabled="true"-->
+
+        <!--授权码模式(即先登录获取code,再获取token)-->
+        <oauth2:authorization-code authorization-code-services-ref="jdbcAuthorizationCodeServices"/>
+        <!--简化模式(在redirect_uri 的Hash传递token; Auth客户端运行在浏览器中,如JS,Flash)-->
+        <oauth2:implicit/>
+        <!--刷新access_token-->
+        <oauth2:refresh-token/>
+        <!--客户端模式(无用户,用户向客户端注册,然后客户端以自己的名义向'服务端'获取资源)-->
+        <oauth2:client-credentials/>
+        <!--密码模式(将用户名,密码传过去,直接获取token)-->
+        <oauth2:password/>
+    </oauth2:authorization-server>
+
+
+    <security:http disable-url-rewriting="true" authentication-manager-ref="authenticationManager" entry-point-ref="authenticationEntryPoint" use-expressions="true">
+
+        <!--默认的http配置,给/oauth/** 设置权限-->
+        <security:intercept-url pattern="/oauth/**" access="hasAnyRole('ROLE_USER','ROLE_UNITY','ROLE_API')"/>
+
+        <!-- 指定角色才能访问 -->
+        <security:intercept-url pattern="/views/system" access="hasAnyRole('ROLE_ROOT')"/>
+        <security:intercept-url pattern="/views/base" access="hasAnyRole('ROLE_ROOT')"/>
+        <security:intercept-url pattern="/druid/**" access="hasAnyRole('ROLE_ROOT')"/>
+
+        <!-- 以上未列出的，也都必须验证才能访问 -->
+        <security:intercept-url pattern="/**" access="isAuthenticated()"/>
+
+        <!-- 所有地址全开，无需验证，测试用 -->
+        <!-- <intercept-url pattern="/**" access="permitAll" /> -->
+
+        <!--没有操作权限-->
+        <!--在security3.x写法 security:http access-denied-page="system/page/error/noSecurity" -->
+        <!--在security4.x写法 <security:access-denied-handler  error-page="" />   可自定义的Handler ref="accessDeniedHandler"  -->
+        <security:access-denied-handler error-page="/system/page/error/noSecurity"/>
+
+        <!--form-login 自定义登录界面，不可以与FORM_LOGIN_FILTER同时用-->
+        <!--<security:form-login login-page="/login.jsp 登录界面" login-processing-url="/login 登录提交地址" username-parameter="用户名参数" password-parameter="密码参数" />-->
+        <security:custom-filter ref="customUsernamePasswordFilter" position="FORM_LOGIN_FILTER"/>
+
+        <!-- 登出 替换默认的LogoutFilter -->
+        <!--<security:logout logout-success-url="/index.jsp" logout-url="/logout"/>-->
+        <security:custom-filter ref="customLogoutFilter" position="LOGOUT_FILTER"/>
+
+        <!-- 实现免登陆验证 -->
+        <security:custom-filter ref="rememberMeFilter" position="REMEMBER_ME_FILTER"/>
+
+
+
+        <!-- 使用自定义的过滤器 -->
+        <security:custom-filter ref="customSecurityFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+
+        <security:csrf disabled="true" token-repository-ref="csrfTokenRepository"/>
+
+        <!--
+        session超时跳转页面 以及每用户可拥有的session最大个数
+        如果每次退出后，必须要求用户必须重开浏览器才能登录，可以将 invalid-session-url="/error/noSession.jsp"，防止有些 Web 应用把用户的会话标识符直接通过 URL 的参数来传递
+        -->
+        <security:session-management invalid-session-url="/views/error/noSession.jsp">
+            <security:concurrency-control max-sessions="1" error-if-maximum-exceeded="true" expired-url="/login.jsp"/>
+        </security:session-management>
+
+        <security:headers>
+            <!--使用 X-Frame-Options 有三个可选的值：DENY：浏览器拒绝当前页面加载任何Frame页面；SAMEORIGIN：frame页面的地址只能为同源域名下的页面；ALLOW-FROM：origin为允许frame加载的页面地址-->
+            <!--<security:frame-options disabled="true" />-->
+            <security:frame-options policy="SAMEORIGIN"/>
+        </security:headers>
+
+        <security:anonymous/>
+    </security:http>
+
+    <!--AuthenticationManager 处理来自于框架其他部分的认证请求-->
+    <security:authentication-manager alias="authenticationManager" erase-credentials="false">
+        <security:authentication-provider ref="authenticationProvider"/>
+        <security:authentication-provider ref="rememberMeAuthenticationProvider"/>
+
+        <!--<security:authentication-provider>
+            <security:user-service>
+                <security:user name="user" password="user" authorities="ROLE_USER"/>
+                <security:user name="admin" password="admin" authorities="ROLE_USER, ROLE_ADMIN"/>
+            </security:user-service>
+            <security:user-service properties="/WEB-INF/config/users.properties"/>
+            其中属性文件应遵循如下格式：
+            username=password,grantedAuthority[,grantedAuthority][,enabled|disabled]
+            所以，对应上面的配置文件，我们的users.properties文件的内容应该如下所示：
+            #username=password,grantedAuthority[,grantedAuthority][,enabled|disabled]
+            user=user,ROLE_USER
+            admin=admin,ROLE_USER,ROLE_ADMIN
+        </security:authentication-provider>-->
+    </security:authentication-manager>
+
+
+    <!-- 配置登录入口点 ,是用于授权服务请求的。默认的URL是：/oauth/authrize-->
+    <!--<bean id="authenticationEntryPoint" class="com.lvtulife.system.component.security.CustomLoginUrlAuthenticationEntryPoint" />-->
+    <bean id="authenticationEntryPoint"
+          class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <constructor-arg value="/login.jsp"/>
+    </bean>
+
+    <!-- 用户名密码验证码拦截器 -->
+    <bean id="customUsernamePasswordFilter"
+          class="com.lvtulife.system.component.security.CustomUsernamePasswordAuthenticationFilter">
+        <property name="filterProcessesUrl" value="/login"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationSuccessHandler">
+            <bean class="com.lvtulife.system.component.security.CustomSavedRequestAwareAuthenticationSuccessHandler">
+                <!--验证成功，跳转的页面-->
+                <property name="defaultTargetUrl" value="/system/page/main"/>
+                <!-- 设置为ture则跳转到defaultTargetUrl 设置为false则跳转到登录前的页面,此处必须设为false,否则无法完整auth2验证流程 -->
+                <property name="alwaysUseDefaultTargetUrl" value="false"/>
+            </bean>
+        </property>
+        <property name="authenticationFailureHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <!--验证失败，跳转的页面-->
+                <property name="defaultFailureUrl" value="/login.jsp?error=1"/>
+            </bean>
+        </property>
+        <property name="rememberMeServices" ref="rememberMeServices"/>
+    </bean>
+
+    <!-- remember拦截器 -->
+    <bean id="rememberMeFilter"
+          class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+        <constructor-arg index="0" ref="authenticationManager"/>
+        <constructor-arg index="1" ref="rememberMeServices"/>
+    </bean>
+
+    <bean id="rememberMeAuthenticationProvider"
+          class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+        <constructor-arg index="0" value="maomao"/>
+    </bean>
+
+    <!-- <bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+          <constructor-arg index="0" value="maomao" />
+          <constructor-arg index="1" ref="userDetailsServiceImpl" />
+          <property name="tokenValiditySeconds" value="604800"></property>
+    </bean> -->
+    <bean id="rememberMeServices"
+          class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+        <constructor-arg index="0" value="maomao"/>
+        <constructor-arg index="1" ref="UserDetailsService"/>
+        <constructor-arg index="2">
+            <bean class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+                <property name="dataSource" ref="dataSource"/>
+                <!--<property name="createTableOnStartup" value="true"/>--> <!-- 是否在系统启动时创建持久化token的数据库表 -->
+            </bean>
+        </constructor-arg>
+        <property name="tokenValiditySeconds" value="604800"/>
+    </bean>
+
+    <!--登出拦截器-->
+    <bean id="customLogoutFilter" class="com.lvtulife.system.component.security.CustomLogoutFilter">
+        <!-- 处理退出的虚拟url -->
+        <property name="filterProcessesUrl" value="/logout"/>
+        <!-- 退出处理成功后的默认显示url -->
+        <constructor-arg index="0" value="/login.jsp?logout"/>
+        <constructor-arg index="1">
+            <!-- 退出成功后的handler列表 -->
+            <array>
+                <!--<ref bean="rememberMeServices"/>-->
+                <!--<bean class="org.springframework.security.web.csrf.CsrfLogoutHandler">
+                    <constructor-arg index="0">
+                        <ref bean="csrfTokenRepository"/>
+                    </constructor-arg>
+                </bean>-->
+                <!--在退出时清除该cookie —  使用不同的服务器的cookie值可能不同, 以Tomcat使用的默认cookie名为JSESSIONID为例-->
+                <bean class="org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler">
+                    <constructor-arg index="0">
+                        <array>
+                            <value>JSESSIONID</value>
+                            <!--<value>remember-me</value>-->
+                        </array>
+                    </constructor-arg>
+                </bean>
+                <bean id="securityContextLogoutHandler"
+                      class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+                <!-- 加入了开发人员自定义的退出成功处理 -->
+                <bean id="customLogoutSuccessHandler" class="com.lvtulife.system.component.security.CustomLogoutHandler"/>
+            </array>
+        </constructor-arg>
+    </bean>
+
+    <!--认证用户-->
+    <bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <!--隐藏掉用户名不存在的错误-->
+        <property name="hideUserNotFoundExceptions" value="false"/>
+        <!--UserDetailsService：实现接口，自定义内容，跟AuthenticationProvider关系密切，用来获取用户信息的。-->
+        <property name="userDetailsService" ref="UserDetailsService"/>
+        <!--UserDetailsChecker：实现接口，自定义内容，跟AuthenticationProvider关系密切，用来校验用户信息的。-->
+        <property name="preAuthenticationChecks" ref="UserDetailsChecker"/>
+        <!-- 密码的加密解密类，可以换成自己的，实现 PasswordEncoder 接口即可 -->
+        <property name="passwordEncoder">
+            <!--<bean class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>-->
+            <bean class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+        </property>
+
+        <!-- 使用MD5加密，并添加动态加密盐,对密码加密算法中使用特定的加密盐及种子 -->
+        <property name="saltSource">
+            <bean class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+                <!--取实现UserDetails接口的类中的字段名即可加密方式：MD5  密码明文+{+盐值+} 如 q{admin},使用工具类MD5Util.md5_SystemWideSaltSource(pwd,salt) -->
+                <property name="userPropertyToUse" value="loginName"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--过滤用户请求类-->
+    <!--<bean id="filterSecurityInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">-->
+    <bean id="customSecurityFilter" class="com.lvtulife.system.component.security.CustomSecurityInterceptor">
+        <!-- 用户拥有的权限 -->
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <!-- 用户是否拥有所请求资源的权限 -->
+        <property name="accessDecisionManager" ref="AccessDecisionManager"/>
+        <!-- 资源与权限对应关系 已使用@Resource注入 -->
+        <!--<property name="securityMetadataSource" ref="SecurityMetadataSourceManager"/>-->
+    </bean>
+
+    <!-- 核心验证类 -->
+    <!-- 如果使用SPRING注解方式，则可直接注释掉 -->
+    <!--
+    <beans:bean id="UserDetailsService" class="com.lvtulife.system.component.security.UserDetailsServiceImpl"/>
+    <beans:bean id="AccessDecisionManager" class="com.lvtulife.system.component.security.AccessDecisionManagerImpl"/>
+    <beans:bean id="SecurityMetadataSourceManager" class="com.lvtulife.system.component.security.SecurityMetadataSourceManagerImpl"/>
+	-->
+
+
+    <!--跨站请求伪造-->
+    <!--<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository"/>-->
+
+    <!--<bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+        <constructor-arg>
+            &lt;!&ndash;HttpSessionCsrfTokenRepository是把token放到session中来存取&ndash;&gt;
+            <bean class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository"/>
+        </constructor-arg>
+    </bean>-->
+    <!--
+        如果用的是spring mvc 的form标签，则配置此项时自动将crsf的token放入到一个hidden的input中，而不需要开发人员显式的写入form
+    -->
+    <!--<bean id="requestDataValueProcessor"
+          class="org.springframework.security.web.servlet.support.csrf.CsrfRequestDataValueProcessor"/>-->
+
+
+    <!--Oauth2 配置 start -->
+
+    <!--TokenStore, 使用JdbcTokenStore, 将token信息存放数据库, 需要提供一个dataSource对象; 也可使用InMemoryTokenStore存于内存中-->
+    <!--<bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore"/>-->
+    <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.store.JdbcTokenStore">
+        <constructor-arg index="0" ref="dataSource"/>
+    </bean>
+
+    <!--TokenServices; 需要注入TokenStore-->
+    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="tokenStore"/>
+        <!--如果允许刷新token 请将supportRefreshToken 的值设置为true, 默认为不允许-->
+        <property name="supportRefreshToken" value="true"/>
+        <property name="clientDetailsService" ref="clientDetailsService"/>
+    </bean>
+
+    <!--ClientDetailsService 配置, 使用JdbcClientDetailsService, 也需要提供dataSource, 替换demo中直接配置在配置文件中-->
+    <!--<bean id="clientDetailsService" class="org.springframework.security.oauth2.provider.client.JdbcClientDetailsService">-->
+    <bean id="clientDetailsService" class="com.lvtulife.system.component.oauth2.CustomJdbcClientDetailsService">
+        <constructor-arg index="0" ref="dataSource"/>
+    </bean>
+
+    <bean id="oAuth2RequestFactory" class="org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory">
+        <constructor-arg name="clientDetailsService" ref="clientDetailsService"/>
+    </bean>
+
+    <!--ClientDetailsUserDetailsService配置, 该类实现了Spring security中 UserDetailsService 接口-->
+    <bean id="oauth2ClientDetailsUserService"
+          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetailsService"/>
+    </bean>
+
+    <!--OAuth2AuthenticationEntryPoint配置-->
+    <bean id="oauth2AuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="exceptionRenderer" ref="headerOnlyExceptionRender"/>
+    </bean>
+
+    <!--OAuth2AccessDeniedHandler配置, 实现AccessDeniedHandler接口-->
+    <bean id="oauth2AccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler">
+        <property name="exceptionRenderer" ref="headerOnlyExceptionRender"/>
+    </bean>
+
+    <!--UserApprovalHandler配置, 这儿使用DefaultUserApprovalHandler, 这里是实现client是否可信任的关键点,你可以扩展该接口来自定义approval行为-->
+    <!--<bean id="oauthUserApprovalHandler" class="org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler">
+    </bean>-->
+    <bean id="oauthUserApprovalHandler" class="com.lvtulife.system.component.oauth2.OauthUserApprovalHandler">
+        <property name="tokenStore" ref="tokenStore"/>
+        <property name="clientDetailsService" ref="clientDetailsService"/>
+        <property name="requestFactory" ref="oAuth2RequestFactory"/>
+        <property name="oauthService" ref="oauthService"/>
+    </bean>
+
+    <bean id="jdbcAuthorizationCodeServices"
+          class="org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices">
+        <constructor-arg index="0" ref="dataSource"/>
+    </bean>
+
+
+    <!--Oauth2 AccessDecisionManager配置, 这儿在默认的Spring Security AccessDecisionManager的基础上添加了ScopeVoter-->
+    <bean id="oauth2AccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter"/>
+                <bean class="org.springframework.security.access.vote.RoleVoter"/>
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!--ClientCredentialsTokenEndpointFilter配置, 该Filter将作用于Spring Security的chain 链条中-->
+    <bean id="clientCredentialsTokenEndpointFilter"
+          class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+        <property name="authenticationManager" ref="oauth2AuthenticationManager"/>
+    </bean>
+
+    <!--自定义错误消息格式-->
+    <bean id="headerOnlyExceptionRender" class="com.lvtulife.system.component.oauth2.HeaderOnlyOAuth2ExceptionRenderer"/>
+
+    <!--
+        开启支持方法注解的权限控制：security:global-method-security pre-post-annotations="enabled"
+            @PreAuthorize：该注解用来确定一个方法是否应该被执行。该注解后面跟着的是一个表达式，如果表达式的值为真，则该方法会被执行。如 @PreAuthorize("hasRole('ROLE_USER')")就说明只有当前用户具有角色 ROLE_USER的时候才会执行。
+            @PostAuthorize：该注解用来在方法执行完之后进行访问控制检查。
+            @PostFilter：该注解用来对方法的返回结果进行过滤。从返回的集合中过滤掉表达式值为假的元素。如@PostFilter("hasPermission(filterObject, 'read')")说明返回的结果中只保留当前用户有读权限的元素。
+            @PreFilter：该注解用来对方法调用时的参数进行过滤。
+
+        security:http 中 auto-config="true" ： 这个是一个自动配置过滤器(Filter)的属性，有自己的配置则不需要开启
+        security:http 中 use-expressions="true"：则拦截器规则声明的 access 属性，需要改为 SpEL 表达式，4.x默认为true
+            access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" OR  access="hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')"
+
+        intercept-url中method说明：
+            POST：只能通过POST访问
+            GET：只能通过GET访问
+            默认为所有的方式都可以
+
+        intercept-url中requires-channel说明：
+            any：表示http和https都可以访问
+            https：只能通过https访问
+            http：只能通过http访问
+            需要注意的是当试图使用http请求限制了只能通过https访问的资源时会自动跳转到对应的https通道重新请求。
+            如果所使用的http或者https协议不是监听在标准的端口上（http默认是80，https默认是443），则需要我们通过port-mapping元素定义好它们的对应关系。
+            <security:port-mappings>
+                <security:port-mapping http="8899" https="9988"/>
+            </security:port-mappings>
+
+        intercept-url中pattern说明：
+            /  就是所有带/的请求
+            /*  代表这个域下面的请求  例如/user/xxx  这种会被拦截  但是不会拦截/user/xxx/xxx
+            /**代表跨域请求   例如/user/xxx 和/user/sss/sss都会被拦截
+
+        intercept-url中access配置:指定访问权限,通过access属性来指定intercept-url对应URL访问所应当具有的权限
+            IS_AUTHENTICATED_ANONYMOUSLY 允许匿名用户进入，不需要登录就可以访问
+            IS_AUTHENTICATED_REMEMBERED 允许登录用户和rememberMe用户进入，用户需要是通过Remember-Me功能进行自动登录的才能访问
+            IS_AUTHENTICATED_FULLY 允许登录用户进入，表示用户的认证类型应该是除前两者以外的，也就是用户需要是通过登录入口进行登录认证的才能访问。
+            access的值是一个字符串，其可以直接是一个权限的定义，也可以是一个表达式，常用的类型有简单的角色名称定义，多个名称之间用逗号分隔
+            access的值是以“ROLE_”开头的则将会交由RoleVoter进行处理
+    -->
+
+    <!--
+        OAUTH2核心参数说明
+
+        grant_type参数说明:
+            authorization_code:授权码模式(即先登录获取code,再获取token) [最常用]
+            password:密码模式(将用户名,密码传过去,直接获取token) [适用于移动设备]
+            client_credentials:客户端模式(无用户,用户向客户端注册,然后客户端以自己的名义向'服务端'获取资源)
+            implicit:简化模式(在redirect_uri 的Hash传递token; Auth客户端运行在浏览器中,如JS,Flash)
+            refresh_token:刷新access_token
+
+            该字段是一般由服务器端指定的,而不是由申请者去选择的,最常用的grant_type组合有:
+                "authorization_code,refresh_token"(针对通过浏览器访问的客户端);
+                "password,refresh_token"(针对移动设备的客户端).
+                implicit与client_credentials在实际中很少使用.
+
+        response_type参数:
+            code:标准的Server授权模式响应模式
+            token:脚本的授权响应模式，直接返回token，需要对回调进行校验
+
+        OAuth角色:
+            资源拥有者（resource owner）：能授权访问受保护资源的一个实体，可以是一个人，那我们称之为最终用户；如新浪微博用户zhangsan；
+            资源服务器（resource server）：存储受保护资源，客户端通过access token请求资源，资源服务器响应受保护资源给客户端；存储着用户zhangsan的微博等信息。
+            授权服务器（authorization server）：成功验证资源拥有者并获取授权之后，授权服务器颁发授权令牌（Access Token）给客户端。
+            客户端（client）：如新浪微博客户端weico、微格等第三方应用，也可以是它自己的官方应用；其本身不存储资源，而是资源拥有者授权通过后，使用它的授权（授权令牌）访问受保护资源，然后客户端把相应的数据展示出来/提交到服务器。“客户端”术语不代表任何特定实现（如应用运行在一台服务器、桌面、手机或其他设备）。
+
+        表结构说明：
+            oauth_client_details：由JdbcClientDetailsService.java操作, 更多的细节请参考该类.也可以根据实际的需要,去扩展或修改该类的实现.
+            oauth_client_token：由JdbcClientTokenServices.java操作，该表用于在客户端系统中存储从服务端获取的token数据,
+            oauth_access_token： 由JdbcTokenStore.java操作.
+            oauth_refresh_token：由JdbcTokenStore.java.操作 如果客户端的grant_type不支持refresh_token,则不会使用该表.
+            oauth_code：由JdbcAuthorizationCodeServices.java.操作.只有当grant_type为"authorization_code"时,该表中才会有数据产生; 其他的grant_type没有使用该表.
+    -->
+
+</beans>

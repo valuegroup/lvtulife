@@ -1,0 +1,2 @@
+<script type="text/javascript" src="<%=request.getContextPath()%>/static/jslib/extension/extPageCustomD.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/static/jslib/extension/extPageFormD.js"></script>

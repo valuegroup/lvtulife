@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- 引入项目配置文件  加载资源文件 其中包含变量信息，必须在Spring配置文件的最前面加载，即第一个加载 -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <!-- 使用locations属性定义多个配置文件 -->
+        <property name="locations">
+            <list>
+                <value>classpath:db.properties</value>
+                <value>classpath:redis.properties</value>
+                <value>classpath:system.properties</value>
+            </list>
+        </property>
+    </bean>
+
+
+    <!--***********************************-->
+    <!--**************连接池***************-->
+    <!--***********************************-->
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="0"/>
+        <!-- 连接池最大使用连接数量 -->
+        <property name="maxActive" value="20"/>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="0"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="60000"/>
+
+        <!-- <property name="poolPreparedStatements" value="true" /> <property name="maxPoolPreparedStatementPerConnectionSize" value="33" /> -->
+
+        <property name="validationQuery" value="${validationQuery}"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="25200000"/>
+
+        <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandoned" value="true"/>
+        <!-- 1800秒，也就是30分钟 -->
+        <property name="removeAbandonedTimeout" value="1800"/>
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="true"/>
+
+        <!-- 监控数据库 -->
+        <!-- <property name="filters" value="mergeStat" /> -->
+        <property name="filters" value="stat"/>
+    </bean>
+    <!--设置数据源c3p0-->
+    <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="preferredTestQuery" value="${validationQuery}"/>
+        &lt;!&ndash;连接池中保留的最小连接数。 &ndash;&gt;
+        <property name="minPoolSize" value="2"/>
+        &lt;!&ndash;连接池中保留的最大连接数。Default: 15 &ndash;&gt;
+        <property name="maxPoolSize" value="50"/>
+        &lt;!&ndash;最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 &ndash;&gt;
+        <property name="maxIdleTime" value="1800"/>
+        &lt;!&ndash;初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 &ndash;&gt;
+        <property name="initialPoolSize" value="${c3p0.initialPoolSize}"/>
+        &lt;!&ndash;当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 &ndash;&gt;
+        <property name="acquireIncrement" value="${c3p0.acquireIncrement}"/>
+        &lt;!&ndash;JDBC的标准参数，用以控制数据源内加载的PreparedStatements数量。但由于预缓存的statements 属于单个connection而不是整个连接池。所以设置这个参数需要考虑到多方面的因素。
+            如果maxStatements与maxStatementsPerConnection均为0，则缓存被关闭。Default: 0 &ndash;&gt;
+        <property name="maxStatements" value="${c3p0.maxStatements}"/>
+        &lt;!&ndash;每60秒检查所有连接池中的空闲连接。Default: 0 &ndash;&gt;
+        <property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}"/>
+        &lt;!&ndash;定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 &ndash;&gt;
+        <property name="acquireRetryAttempts" value="${c3p0.acquireRetryAttempts}"/>
+        &lt;!&ndash;获取连接失败将会引起所有等待连接池来获取连接的线程抛出异常。但是数据源仍有效 保留，并在下次调用getConnection()的时候继续尝试获取连接。如果设为true，那么在尝试获取连接失败后该数据源将申明已断开并永久关闭。Default: false &ndash;&gt;
+        <property name="breakAfterAcquireFailure" value="${c3p0.breakAfterAcquireFailure}"/>
+        &lt;!&ndash;因性能消耗大请只在需要的时候使用它。如果设为true那么在每个connection提交的 时候都将校验其有效性。建议使用idleConnectionTestPeriod或automaticTestTable等方法来提升连接测试的性能。Default: false &ndash;&gt;
+        <property name="testConnectionOnCheckout" value="${c3p0.testConnectionOnCheckout}"/>
+        &lt;!&ndash; 配置断开连接自动自重连 &ndash;&gt;
+        <property name="testConnectionOnCheckin" value="${c3p0.testConnectionOnCheckin}"/>
+        &lt;!&ndash; 泄漏 监控 &ndash;&gt;
+        <property name="unreturnedConnectionTimeout" value="${c3p0.unreturnedConnectionTimeout}"/>
+        <property name="debugUnreturnedConnectionStackTraces" value="${c3p0.debugUnreturnedConnectionStackTraces}"/>
+    </bean>-->
+
+    <!--***********************************-->
+    <!--**************SpringJDBC**************-->
+    <!--***********************************-->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--***********************************-->
+    <!--************Hibernate************-->
+    <!--***********************************-->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan">
+            <list>
+                <value>com.lvtulife.*.model</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <!--hibernate.dialect:一个Hibernate Dialect类名允许Hibernate针对特定的关系数据库生成优化的SQL. 取值 full.classname.of.Dialect-->
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <!--hibernate.show_sql:输出所有SQL语句到控制台. 有一个另外的选择是把org.hibernate.SQL这个log category设为debug。 eg. true | false-->
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <!--hibernate.format_sql	在log和console中打印出更漂亮的SQL。 取值 true | false-->
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <!--hibernate.jdbc.fetch_size	非零值，指定JDBC抓取数量的大小 (调用Statement.setFetchSize()).-->
+                <prop key="hibernate.jdbc.fetch_size">${hibernate.jdbc.fetch_size}</prop>
+                <!--hibernate.jdbc.batch_size	非零值，允许Hibernate使用JDBC2的批量更新. 取值 建议取5到30之间的值-->
+                <prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+                <!--hibernate.current_session_context_class	为"当前" Session指定一个(自定义的)策略。eg. jta | thread | custom.Class-->
+                <!-- <prop key="current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>-->
+                <!--hibernate.cache.use_query_cache	允许查询缓存, 个别查询仍然需要被设置为可缓存的. 取值 true|false-->
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <!--hibernate.jdbc.use_scrollable_resultset	允许Hibernate使用JDBC2的可滚动结果集. 只有在使用用户提供的JDBC连接时，这个选项才是必要的, 否则Hibernate会使用连接的元数据. 取值 true | false-->
+                <prop key="hibernate.jdbc.use_scrollable_resultset">false</prop>
+                <!--hibernate.cache.use_second_level_cache	能用来完全禁止使用二级缓存. 对那些在类的映射定义中指定<cache>的类，会默认开启二级缓存. 取值 true|false-->
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <!-- 高速缓存提供程序 -->
+                <!-- 由于spring也使用了Ehcache, 保证双方都使用同一个缓存管理器 -->
+                <prop key="hibernate.cache.region.factory_class">
+                    org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+                </prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!--***********************************-->
+    <!--**************MyBatis**************-->
+    <!--***********************************-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--指定要用到的连接池-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--指定mybatis的核心配置文件-->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+
+        <!-- 当mybatis的xml文件和mapper接口不在相同包下时，需要用mapperLocations属性指定xml文件的路径。*是个通配符，代表所有的文件，**代表所有目录下 -->
+        <property name="mapperLocations" value="classpath:com/lvtulife/*/mapper/*Mapper.xml"></property>
+
+        <!--IDEA的maven项目中，默认源代码目录下的xml等资源文件并不会在编译的时候一块打包进classes文件夹，会直接舍弃掉，解决IDEA的这个问题有两种方式。-->
+        <!--第一种是建立src/main/resources文件夹，将xml等资源文件放置到这个目录中。maven工具默认在编译的时候，会将resources文件夹中的资源文件一块打包进classes目录中。-->
+        <!--<property name="mapperLocations" value="classpath:mybatis/mapper/*-mapper.xml"/>-->
+        <!--第二种解决方式是配置maven的pom文件配置，在pom文件中找到<build><resources><resource>节点，添加下列代码：<directory>src/main/java</directory><includes><include>**/*.xml</include> </includes>-->
+        <!--其中<directory>src/main/java</directory>表明资源文件的路径，<include>**/*.xml</include>表明需要编译打包的文件类型是xml文件，如果有其它资源文件也需要打包，可以修改或添加通配符。-->
+
+        <!--<property name="typeAliasesPackage" value="com.lvtulife.*.mybatis.entity"></property>-->
+    </bean>
+    <!-- 自动扫描 将Mapper接口生成代理注入到Spring -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 映射器接口文件的包路径， -->
+        <property name="basePackage" value="com.lvtulife.*.mapper"/>
+    </bean>
+    <bean id="mybatisSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
+        <!-- 这个执行器会批量执行更新语句, 还有SIMPLE 和 REUSE -->
+        <constructor-arg index="1" value="REUSE"></constructor-arg>
+        <!--
+        BATCH 更新操作返回的永远是一个固定值，设置为 SIMPLE 或 REUSE 才可以正常返回更新删除操作影响的条数
+        ExecutorType.SIMPLE 它会为每个语句的执行创建一个新的预处理语句，具体的实现类为 org.apache.ibatis.executor.BatchExecutor
+        ExecutorType.REUSE 它会复用预处理语句，具体的实现类为org.apache.ibatis.executor.BatchExecutor
+        ExecutorType.BATCH 这个执行器会批量执行更新语句，具体的实现类为org.apache.ibatis.executor.BatchExecutor-->
+    </bean>
+
+
+    <!--***********************************-->
+    <!--**************事务处理*************-->
+    <!--***********************************-->
+    <!-- 配置事务管理器 特殊说明:若是使用mysql数据库,请将引擎设置为ENGINE=INNODB -->
+
+    <!--此事务管理器是针对传统的JDBC进行事务管理，在spring中是对JdbcTemplate进行事务管理-->
+    <!--<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" >
+        <property name="dataSource" ref="dataSource" />
+    </bean>-->
+
+    <!--是对Hibernate进行事务管理，当在spring中使用HibernateTemplate时，要使用此管理器。-->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- 注解方式配置事物 proxy-target-class属性值决定是基于接口的还是基于类的代理被创建; order 控制aop通知的优先级，值越小，优先级越高,此处设置为2，SysLogAspect 设置为1，以便出错是能写入数据库-->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" order="3"/>
+
+    <!-- 配置事务异常封装 -->
+    <bean id="persistenceExceptionTranslationPostProcessor" class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+
+    <!--***********************************-->
+    <!--**************ehcache**************-->
+    <!--***********************************-->
+    <!-- 配置eh缓存管理器 cacheManager工厂类 由于hibernate也使用了Ehcache, shared=true保证双方都使用同一个缓存管理器 -->
+    <bean id="cacheManager"
+          class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <!-- 缓存的配置文件 ehcache.xml 的位置 -->
+        <property name="configLocation" value="classpath:ehcache.xml"/>
+        <!-- 由于hibernate也使用了Ehcache, 保证双方都使用同一个缓存管理器 -->
+        <property name="shared" value="true"/>
+    </bean>
+
+    <!-- 开启spring缓存 -->
+    <cache:annotation-driven cache-manager="springCache"/>
+    <bean id="springCache" class="org.springframework.cache.ehcache.EhCacheCacheManager"
+          p:cacheManager-ref="cacheManager"/>
+
+
+    <!--***********************************-->
+    <!--**********自动扫描业务组件*********-->
+    <!--***********************************-->
+    <!--自动扫描 base-package为需要扫描的包（含所有子包） @Service用于标注业务层组件,@Repository用于标注数据访问组件，即DAO组件，而@Component泛指组件，当组件不好归类的时候，我们可以使用这个注解进行标注。-->
+    <context:component-scan base-package="com.lvtulife.*.service,com.lvtulife.*.manager" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+    <context:component-scan base-package="com.lvtulife.*.dao,com.lvtulife.*.mapper" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+    <context:component-scan base-package="com.lvtulife.*.component" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+    </context:component-scan>
+    <!--<context:component-scan base-package="com.lvtulife"></context:component-scan>-->
+
+
+
+    <!--***********************************-->
+    <!--***********图片验证码组件**********-->
+    <!--***********************************-->
+    <bean id="imageCaptchaService" class="com.octo.captcha.service.multitype.GenericManageableCaptchaService">
+        <description>验证码服务</description>
+        <constructor-arg index="0" ref="imageEngine"/>
+        <constructor-arg type="int" index="1" value="180"/><!--超时时间 秒 -->
+        <constructor-arg type="int" index="2" value="20000"/><!--最大并发数 -->
+        <constructor-arg type="int" index="3" value="20000"/>
+    </bean>
+    <bean id="imageEngine" class="com.lvtulife.system.component.security.ImageGenericCaptchaEngine"/>
+
+
+    <!--***********************************-->
+    <!--*****druid监控spring jdbc**********-->
+    <!--***********************************-->
+    <bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+    </bean>
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">
+        <property name="patterns">
+            <list>
+                <value>com.lvtulife.*.service.*</value>
+                <value>com.lvtulife.*.manager.*</value>
+                <value>com.lvtulife.*.dao.*</value>
+            </list>
+        </property>
+    </bean>
+    <aop:config>
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut"/>
+    </aop:config>
+
+    <!-- 启动对@AspectJ注解的支持(service 层和Controller 层需独立开启) -->
+    <aop:aspectj-autoproxy/>
+
+
+    <!--***********************************-->
+    <!--**************国际化***************-->
+    <!--***********************************-->
+    <!-- 定义上下文返回的消息的国际化 -->
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages.messages_zh_CN"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+    </bean>
+    <!-- 获取本地区的语言消息 -->
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+    </bean>
+    <bean id="localeResolver"
+          class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+        <property name="defaultLocale" value="zh"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,119 @@
+html,body,div,ul,li,h1 {
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	font-size: 1em;
+	font-weight: normal;
+	font-style: normal;
+}
+
+a {
+	text-decoration: none;
+	color: #515151;
+}
+
+ul,li {
+	list-style: none;
+}
+
+body {
+	font-family: "微软雅黑", "Microsoft Yahei", Arial, Helvetica, sans-serif, "宋体";
+	font-size: 14px;
+}
+
+/* table样式,空白 */
+.table {border-collapse: collapse;border-spacing: 0;}
+.table tr {height: 35px;}
+.table th,.table td {border: 0px solid #8CACBB;padding: 0.3em 0.7em;text-align: left;}
+/* .remark {font-size: 10pt;text-align: left;color: gray;} */
+.table th {/* background: #F8F8F8; */text-align: center;font-size: 10pt;font-weight: normal; /* bold; */}
+.table thead th {text-align: center;}
+.table tbody th {text-align: right;}
+.table tr:hover {/* background-color: #f6fafd; */}
+.table td:hover {/* background-color: #f9feff; */}
+.form th {text-align: right;}
+.form th,.form td {padding: 0.1em 0.3em;border: 0px solid #D1D7DC;}
+.form input,.form select,.form textarea {width: 200px;}
+.form input[type='checkbox'],.form input[type='radio'] {width: 20px;}
+
+/* table2样式,带边框,移动变色 */
+.table2 {border-collapse: collapse;border-spacing: 0;}
+.table2 th,.table2 td {border: 1px solid #8CACBB;padding: 0.3em 0.7em;text-align: left;}
+.table2 th {background: #F8F8F8;text-align: center;}
+.table2 thead th {text-align: center;}
+.table2 tbody th {text-align: right;}
+.table2 tr:hover {background-color: #f6fafd;}
+.table2 td:hover {background-color: #f9feff;}
+.form2 th {text-align: right;}
+.form2 th,.form2 td {padding: 0.1em 0.3em;border: 1px solid #D1D7DC;}
+.form2 input,.form2 select,.form2 textarea {width: 200px;}
+.form2 input[type='checkbox'],.form2 input[type='radio'] {width: 20px;}
+
+/* table3 参考foxmail编辑框 */
+.formTable {border-collapse: collapse;border-spacing: 0;margin-top: 10px;}
+.formTable tr {height: 35px;}
+.formTable th,.table3 td {border: 0px solid #8CACBB;padding: 0.3em 0.7em;text-align: left;}
+.formTable th {text-align: center;font-size: 10pt;font-weight: normal;color:#666666;width:90px;}
+.formTable thead th {text-align: center;}
+.formTable tbody th {text-align: right;}
+.formTable .lineStyle {width: 350px;height:1px;margin:0px auto;padding:0px;background-color:#EEEEEE;overflow:hidden;float: left;}
+
+.formTable .tableTitle {
+	color: #6390BA;
+}
+.formForm th {text-align: right;}
+.formForm th,.formForm td {padding: 0.1em 0.3em;border: 0px solid #D1D7DC;}
+.formForm input,.formForm textarea {width: 320px;}
+.formForm select {width: 325px;}
+.formForm input[type='checkbox'],.formForm input[type='radio'] {width: 20px;}
+
+
+fieldset {
+	border: 1px dotted #D1D7DC;
+	margin: 15px;
+}
+
+legend {
+	border: 1px dotted #D1D7DC;
+	font-size: small;
+}
+
+/* 选项卡页面,工具栏 #F4F4F4 FFFFFF*/
+.systoolbar {
+	height: 32px;
+	background: #FFFFFF;
+	padding: 6px 0px 0px 10px;
+	border-bottom: 1px solid #dddddd;
+	text-align: left;
+}
+/* 选项卡页面,中部面板 */
+.systoolcenter {
+	padding: 10px 15px 15px 15px;
+	background: #FFFFFF;
+}
+/* 选项卡页面,面板 */
+.systoolpanel {
+	/*padding:10px;*/
+	
+}
+/* 统一的时间框样式*/
+.sysSearchDateBox {
+	width: 135px;
+	border: 1px #ddd solid;
+}
+/* 统一的按钮及搜索框排序样式*/
+.sysToolBarUl {
+	list-style-type: none;
+	width: 100%;
+	height: 26px;
+	margin: 5px;
+	padding: 0px;
+}
+
+.sysToolBarUl li {
+	height: 26px;
+	float: left;
+	margin-left: 4px;
+}

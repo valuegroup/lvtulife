@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <setting name="useColumnLabel" value="true"/>
+        <setting name="useGeneratedKeys" value="true"/>
+        <setting name="defaultExecutorType" value="SIMPLE"/>
+        <setting name="localCacheScope" value="STATEMENT"/>
+        <!--
+        cacheEnabled：该配置影响的所有映射器中配置的缓存的全局开关
+        lazyLoadingEnabled：延迟加载的全局开关
+        useColumnLabel：使用列标签代替列名useGeneratedKeys：允许 JDBC 支持自动生成主键
+        defaultStatementTimeout：设置超时时间
+        localCacheScope：本地缓存机制（SESSION/STATEMENT）
+        -->
+    </settings>
+
+
+    <!--<typeAliases />-->
+
+    <!--<mappers>
+         <mapper resource="applicationContext_query/PageIbatis.xml" />
+         <mapper resource="applicationContext_query/basePage.xml" />
+    </mappers>-->
+
+</configuration>

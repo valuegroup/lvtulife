@@ -1,0 +1,266 @@
+<li>
+    <div class="time">20140823</div>
+    <div class="version">v1.0.20</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+数据库>修改系统模块的所有表,去除表名中的'tb_'字符,今后表命名中不在使用'tb'字符
+项目框架>除去系统实体类类名中的'tb_'字符,以及修改相关引用
+数据库>备份数据库easy_wms-2014-08-23.sql
+数据库>建立简单仓储管理系统的数据库模型VS_LvtpreifeEasyWMS.pdm
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140819</div>
+    <div class="version">v1.0.19</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+项目框架>将所有jsp访问改为action访问,以便于权限控制
+项目框架>公有jsp访问,放置于pageAction中
+项目框架>模块jsp访问,放置于各模块Action中
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140810</div>
+    <div class="version">v1.0.18</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+项目框架>更名为旅途生活信息管理系统lvtpreife
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140809</div>
+    <div class="version">v1.0.17</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+用户管理>解决由未设置toolbar高度而导致分页工具栏不显示问题
+用户管理>优化查询功能布局
+用户管理>解决因存在中文过滤条件而至数据无法导出的问题
+用户管理>数据功能导出加入友好提示
+用户管理>后台的导入导出方法加入权限控制,防止恶意导入导出
+main页面>优化中央选项卡中最后一个选项页不能关闭的提示方式
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140807</div>
+    <div class="version">v1.0.16</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+用户管理>使用Tooltip对部分功能进行提示
+用户管理>双击行记录可弹出查看框
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140806</div>
+    <div class="version">v1.0.15</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+用户管理>使用Menubutton优化按钮布局,使其更简洁实用
+系统全局>jquery-easyui-1.3.4 升级为 jquery-easyui-1.4
+north面板>因版本升级去除部分easyui主题
+inc引用>修改easyui默认主题为metro
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140805</div>
+    <div class="version">v1.0.14</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+用户管理>添加批量删除功能
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140727</div>
+    <div class="version">v1.0.13</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+权限点和资源类型需要添加排序字段，同时更改个人信息和各管理模块中的相关引用
+用户编辑>支持超大文件上传带进度条
+用户管理>用户数据导入导出功能（暂时不支持多类型的导入出）
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140722</div>
+    <div class="version">v1.0.12</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+我的信息>完善页面内容
+系统监控>项目监控
+系统监控>数据源监控
+系统监控>Action映射监控
+系统监控>用户登录历史监控
+系统报表>注册时间分布
+系统报表>用户角色分布
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140721</div>
+    <div class="version">v1.0.11</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+资源编辑>权限点管理功能
+资源类型>资源类型管理功能
+系统全局>代码审查，修改查询时资源浪费问题
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140718</div>
+    <div class="version">v1.0.10</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+完成各资源页面中按钮的操作权限控制
+完成系统主菜单树和下拉菜单树的权限控制
+资源编辑>完善‘顺序’字段的默认值从数据库中读取最大值
+角色管理>修复角色授权页面中子节点与父节点勾选同步问题
+便捷菜单>增加本地工具功能，可执行CMD命令调用系统附件功能
+资源编辑>修复资源权限点添加或修改存在的级联数据被删除的问题
+角色管理>修复角色授权页面中无访问权限点的资源加载问题
+完成资源模块自动加载并受权限控制
+完善操作按钮位置布局，提供多选操作
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140712</div>
+    <div class="version">v1.0.9</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+main页面>完善多类型资源菜单初始化功能，实现通过不用资源类型和角色权限动态加载资源菜单
+系统全局>完成系统权限限定功能
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140710</div>
+    <div class="version">v1.0.8</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+衣食住行>引入Unslider，轮播插件。支持键盘导航、自动调整高度和响应式布局。
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140709</div>
+    <div class="version">v1.0.7</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+角色管理>添加设置资源权限模块
+角色管理>完善资源授权模块里面tree节点的全选折叠等功能
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140706</div>
+    <div class="version">v1.0.6</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+资源编辑>添加资源权限点设置模块
+资源编辑>引入iCheck，可让不同浏览器下的复选框和单选按钮更美观、功能更强。
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140705</div>
+    <div class="version">v1.0.5</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+完善系统权限限定和授权功能
+完善当前用户信息更新后同时更新session中的用户和north面板
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140704</div>
+    <div class="version">v1.0.4</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+完善角色权限模块的相关功能
+south面板>屏蔽south面板
+用户编辑>完善图片上传功能
+修复角色删除时有外键报错
+north页面>完善个人头像展示和开始菜单栏目位置摆放
+修复用户信息修改后密码和邮箱被置空
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140703</div>
+    <div class="version">v1.0.3</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+完善导航模块的相关功能
+完善用户模块的相关功能
+north页面>完善首页菜单按钮
+main页面>屏蔽选项卡工具栏中的上下左右切换功能和简化文字显示
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140702</div>
+    <div class="version">v1.0.2</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+修复移植后的异常信息
+struts配置>修复未设置默认拦截器而导致页面参数未导入至Action数据模型中
+修复用户登录注册
+</pre>
+    </div>
+</li>
+
+<li>
+    <div class="time">20140628</div>
+    <div class="version">v1.0.1</div>
+    <div class="number"></div>
+    <div class="content">
+<pre>
+系统框架>基于SSHE创建easyWms
+v1.0 版本开始↑
+</pre>
+    </div>
+</li>

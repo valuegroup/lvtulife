@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 系统日志 Mybatis Dao实现 -->
+<mapper namespace="com.lvtulife.base.mapper.BaseLogMapper">
+
+    <select id="findBaseLog" parameterType="int" resultType="com.lvtulife.base.model.BaseLog">
+        select * from base_log where id=#{id}
+    </select>
+
+
+</mapper>
